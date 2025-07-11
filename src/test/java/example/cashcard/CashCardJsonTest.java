@@ -43,4 +43,35 @@ class CashCardJsonTest {
         // isEqualTo(123.45) -> ตรวจสอบว่าค่าที่ดึงออกมาเท่ากับ 123.45
         assertThat(json.write(cashCard)).extractingJsonPathNumberValue("@.amount").isEqualTo(123.45);
     }
+
+    @Test // @Test: Annotation จาก JUnit ที่ระบุว่าเมธอดนี้เป็น Test Case ที่ต้องถูกรัน
+    void cashCardDeserializationTest() throws IOException { // เมธอดทดสอบการ Deserialization (แปลง JSON String กลับเป็น Object Java)
+        // throws IOException: แจ้งว่าเมธอดนี้อาจเกิดข้อผิดพลาดที่เกี่ยวข้องกับการอ่าน/เขียน (เช่น การอ่าน JSON String)
+        String expected = """   
+            {                   
+                "id":99,        
+                "amount":123.45 
+                
+            }
+            """;
+
+        // 1. ตรวจสอบการ Deserialization ของ Object ทั้งหมด
+        // json.parseObject(expected): ทำการแปลง JSON String 'expected' ให้เป็น CashCard Object
+        // .id(): ดึงค่า id จาก CashCard Object ที่ได้จากการแปลง
+        // .isEqualTo(new CashCard(99L,123.45)): ยืนยันว่า CashCard Object ที่ได้มี id และ amount ตรงกับ CashCard ที่สร้างขึ้นใหม่
+        //                                       (นี่เป็นการยืนยันว่า Object ทั้งก้อนถูกแปลงอย่างถูกต้อง)
+        assertThat(json.parse(expected)).isEqualTo(new CashCard(99L,123.45));
+
+        // 2. ตรวจสอบค่า 'id' ที่ได้จากการ Deserialization
+        // json.parseObject(expected): ทำการแปลง JSON String ให้เป็น CashCard Object
+        // .id(): ดึงค่า id จาก CashCard Object ที่ได้
+        // .isEqualTo(99): ยืนยันว่าค่า id ที่ได้นั้นเท่ากับ 99 (ซึ่งตรงกับค่าใน JSON String)
+        assertThat(json.parseObject(expected).id()).isEqualTo(99);
+
+        // 3. ตรวจสอบค่า 'amount' ที่ได้จากการ Deserialization
+        // json.parseObject(expected): ทำการแปลง JSON String ให้เป็น CashCard Object
+        // .amount(): ดึงค่า amount จาก CashCard Object ที่ได้
+        // .isEqualTo(123.45): ยืนยันว่าค่า amount ที่ได้นั้นเท่ากับ 123.45 (ซึ่งตรงกับค่าใน JSON String)
+        assertThat(json.parseObject(expected).amount()).isEqualTo(123.45);
+    }
 }
