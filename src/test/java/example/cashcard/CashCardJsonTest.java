@@ -48,10 +48,9 @@ class CashCardJsonTest {
     void cashCardDeserializationTest() throws IOException { // เมธอดทดสอบการ Deserialization (แปลง JSON String กลับเป็น Object Java)
         // throws IOException: แจ้งว่าเมธอดนี้อาจเกิดข้อผิดพลาดที่เกี่ยวข้องกับการอ่าน/เขียน (เช่น การอ่าน JSON String)
         String expected = """   
-            {                   
-                "id":99,        
-                "amount":123.45 
-                
+            {
+                "id":99,
+                "amount":123.45
             }
             """;
 
