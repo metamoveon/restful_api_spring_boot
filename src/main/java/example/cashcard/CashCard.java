@@ -1,4 +1,6 @@
-package example.cashcard; // กำหนด package ของคลาสนี้ เพื่อจัดระเบียบโค้ดของโปรเจกต์
+package example.cashcard;
+
+import org.springframework.data.annotation.Id;  //เรียกใช้ แพคเกจ annotation ในหมวดของ Id
 
 // ประกาศ Java Record ชื่อ CashCard
 // Record เป็นคุณสมบัติใหม่ใน Java ที่ช่วยให้เราสร้างคลาสสำหรับเก็บข้อมูลได้กระชับและอ่านง่ายขึ้น
@@ -8,7 +10,7 @@ package example.cashcard; // กำหนด package ของคลาสนี
 // 2. Accessor Methods: เมธอด 'id()' และ 'amount()' (คล้ายกับ Getter) เพื่อเข้าถึงค่า
 // 3. equals() และ hashCode(): เมธอดสำหรับเปรียบเทียบความเท่าเทียมกันของวัตถุ CashCard
 // 4. toString(): เมธอดสำหรับสร้างข้อความแสดงผลของวัตถุ CashCard ที่อ่านง่าย
-record CashCard(Long id, Double amount){
+record CashCard(@Id  Long id, Double amount){
 
     // ใน record เราไม่จำเป็นต้องเขียน constructor, getter, equals(), hashCode(), หรือ toString()
     // ด้วยตัวเองเลย เพราะคอมไพเลอร์จะจัดการสร้างให้โดยอัตโนมัติจาก components ที่เราประกาศไว้ด้านบน (id, amount)
