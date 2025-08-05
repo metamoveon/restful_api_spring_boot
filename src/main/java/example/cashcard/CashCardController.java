@@ -45,8 +45,10 @@ public class CashCardController {
         Page<CashCard> page = cashCardRepository.findAll(
                 PageRequest.of(
                         pageable.getPageNumber(),
-                        pageable.getPageSize()
+                        pageable.getPageSize(),
+                        pageable.getSortOr(Sort.by(Sort.Direction.ASC, "amount"))// เพิ่มบรรทัดนี้
                 ));
         return ResponseEntity.ok(page.getContent());
     }
+
 }

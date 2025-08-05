@@ -3,7 +3,6 @@ package example.cashcard;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import net.minidev.json.JSONArray;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,19 +22,8 @@ class CashCardApplicationTests {
 	@Autowired
 	TestRestTemplate restTemplate;
 
-	@Autowired
-	private CashCardRepository cashCardRepository;
-
-
-	@BeforeEach
-	void setup() {
-		CashCard card = new CashCard(99L, 123.45);
-		cashCardRepository.save(card);
-	}
-
 	@Test
 	void shouldReturnACashCardWhenDataIsSaved() {
-
 		ResponseEntity<String> response = restTemplate.getForEntity("/cashcards/99", String.class);
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
@@ -75,12 +63,15 @@ class CashCardApplicationTests {
 	}
 
 	@Test
-	void shouldReturnAPageOfCashCards() {
-		ResponseEntity<String> response = restTemplate.getForEntity("/cashcards?page=0&size=1", String.class);
+	void shouldReturnASortedPageOfCashCardsWithNoParametersAndUseDefaultValues() {
+		ResponseEntity<String> response = restTemplate.getForEntity("/cashcards", String.class);
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
 		DocumentContext documentContext = JsonPath.parse(response.getBody());
 		JSONArray page = documentContext.read("$[*]");
-		assertThat(page.size()).isEqualTo(1);
+		assertThat(page.size()).isEqualTo(3);
+
+		JSONArray amounts = documentContext.read("$..amount");
+		assertThat(amounts).containsExactly(1.00, 123.45, 150.00);
 	}
 }
