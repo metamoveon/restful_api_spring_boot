@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 
 import java.util.Objects;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "cash_card")
@@ -21,6 +22,7 @@ public class CashCard {
     private Double amount;
 
     @Column(nullable = false)
+    @JsonIgnore
     private String owner;  // ✅ เพิ่มฟิลด์ owner
 
     // Default constructor for JPA
