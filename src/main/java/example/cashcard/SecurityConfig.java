@@ -23,8 +23,9 @@ class SecurityConfig {
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers(new AntPathRequestMatcher("/cashcards/**"))
-                        .hasRole("CARD-OWNER"))
+                        .requestMatchers(new AntPathRequestMatcher("/cashcards/**")).hasRole("CARD-OWNER")
+                        .anyRequest().authenticated()
+                )
                 .httpBasic(withDefaults())
                 .csrf(AbstractHttpConfigurer::disable);
 

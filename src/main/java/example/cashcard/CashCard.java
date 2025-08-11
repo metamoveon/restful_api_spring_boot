@@ -7,9 +7,6 @@ import jakarta.persistence.Table;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 
-import java.util.Objects;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 @Entity
 @Table(name = "cash_card")
 public class CashCard {
@@ -22,27 +19,23 @@ public class CashCard {
     private Double amount;
 
     @Column(nullable = false)
-    @JsonIgnore
-    private String owner;  // ✅ เพิ่มฟิลด์ owner
+    private String owner;
 
-    // Default constructor for JPA
-    public CashCard() {
-    }
+    public CashCard() {}
 
-    // Constructor แบบ 2 พารามิเตอร์
-    public CashCard(Long id, Double amount) {
-        this.id = id;
+    public CashCard(Double amount, String owner) {
         this.amount = amount;
+        this.owner = owner;
     }
 
-    // ✅ Constructor แบบ 3 พารามิเตอร์
     public CashCard(Long id, Double amount, String owner) {
         this.id = id;
         this.amount = amount;
         this.owner = owner;
     }
 
-    // Getters and Setters
+    // getters และ setters
+
     public Long getId() {
         return id;
     }
@@ -65,31 +58,5 @@ public class CashCard {
 
     public void setOwner(String owner) {
         this.owner = owner;
-    }
-
-    // equals and hashCode
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof CashCard)) return false;
-        CashCard cashCard = (CashCard) o;
-        return Objects.equals(id, cashCard.id) &&
-                Objects.equals(amount, cashCard.amount) &&
-                Objects.equals(owner, cashCard.owner);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, amount, owner);
-    }
-
-    // toString
-    @Override
-    public String toString() {
-        return "CashCard{" +
-                "id=" + id +
-                ", amount=" + amount +
-                ", owner='" + owner + '\'' +
-                '}';
     }
 }

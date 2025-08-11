@@ -1,6 +1,5 @@
 package example.cashcard;
 
-
 import org.assertj.core.util.Arrays;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,9 +25,9 @@ class CashCardJsonTest {
     @BeforeEach
     void setUp() {
         cashCards = Arrays.array(
-                new CashCard(99L, 123.45),
-                new CashCard(100L, 1.00),
-                new CashCard(101L, 150.00));
+                new CashCard(99L, 123.45, "owner"),
+                new CashCard(100L, 1.00, "owner"),
+                new CashCard(101L, 150.00, "owner"));
     }
 
     @Test
@@ -48,15 +47,15 @@ class CashCardJsonTest {
         String expected = """
             {
                 "id": 99,
-                "amount": 123.45
+                "amount": 123.45,
+                "owner": "owner"
             }
             """;
         assertThat(json.parse(expected))
-                .isEqualTo(new CashCard(99L, 123.45));
-        assertThat(json.parseObject(expected).getId()).isEqualTo(99);      // แก้ไขตรงนี้
-        assertThat(json.parseObject(expected).getAmount()).isEqualTo(123.45); // แก้ไขตรงนี้
+                .isEqualTo(new CashCard(99L, 123.45, "owner"));
+        assertThat(json.parseObject(expected).id()).isEqualTo(99L);
+        assertThat(json.parseObject(expected).amount()).isEqualTo(123.45);
     }
-
 
     @Test
     void cashCardListSerializationTest() throws IOException {
@@ -65,11 +64,11 @@ class CashCardJsonTest {
 
     @Test
     void cashCardListDeserializationTest() throws IOException {
-        String expected="""
+        String expected = """
          [
-            { "id": 99, "amount": 123.45 },
-            { "id": 100, "amount": 1.00 },
-            { "id": 101, "amount": 150.00 }
+            { "id": 99, "amount": 123.45, "owner": "owner" },
+            { "id": 100, "amount": 1.00, "owner": "owner" },
+            { "id": 101, "amount": 150.00, "owner": "owner" }
          ]
          """;
         assertThat(jsonList.parse(expected)).isEqualTo(cashCards);
