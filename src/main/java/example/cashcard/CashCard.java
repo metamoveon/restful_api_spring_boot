@@ -6,6 +6,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Table;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
+import java.util.Objects;
 
 @Entity
 @Table(name = "cash_card")
@@ -35,7 +36,6 @@ public class CashCard {
     }
 
     // getters และ setters
-
     public Long getId() {
         return id;
     }
@@ -58,5 +58,21 @@ public class CashCard {
 
     public void setOwner(String owner) {
         this.owner = owner;
+    }
+
+    // override equals และ hashCode เพื่อให้ test เปรียบเทียบ object ถูกต้อง
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof CashCard)) return false;
+        CashCard cashCard = (CashCard) o;
+        return Objects.equals(id, cashCard.id) &&
+                Objects.equals(amount, cashCard.amount) &&
+                Objects.equals(owner, cashCard.owner);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, amount, owner);
     }
 }

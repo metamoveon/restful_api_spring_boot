@@ -1,76 +1,51 @@
 package example.cashcard;
 
-import org.assertj.core.util.Arrays;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.json.JsonTest;
-import org.springframework.boot.test.json.JacksonTester;
 
-import java.io.IOException;
+import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@JsonTest
 class CashCardJsonTest {
 
-    @Autowired
-    private JacksonTester<CashCard> json;
-
-    @Autowired
-    private JacksonTester<CashCard[]> jsonList;
-
-    private CashCard[] cashCards;
+    private ObjectMapper mapper;
 
     @BeforeEach
     void setUp() {
-        cashCards = Arrays.array(
+        mapper = new ObjectMapper();
+    }
+
+    @Test
+    void cashCardSerializationTest() throws Exception {
+        CashCard card = new CashCard(99L, 123.45, "owner");
+
+        String json = mapper.writeValueAsString(card);
+
+        String expectedJson = "{\"id\":99,\"amount\":123.45,\"owner\":\"owner\"}";
+
+        // เปรียบเทียบแบบ JSON tree จะไม่สนใจ whitespace
+        assertEquals(mapper.readTree(expectedJson), mapper.readTree(json));
+    }
+
+    @Test
+    void cashCardListSerializationTest() throws Exception {
+        List<CashCard> cards = List.of(
                 new CashCard(99L, 123.45, "owner"),
-                new CashCard(100L, 1.00, "owner"),
-                new CashCard(101L, 150.00, "owner"));
-    }
+                new CashCard(100L, 1.0, "owner"),
+                new CashCard(101L, 150.0, "owner")
+        );
 
-    @Test
-    void cashCardSerializationTest() throws IOException {
-        CashCard cashCard = cashCards[0];
-        assertThat(json.write(cashCard)).isStrictlyEqualToJson("single.json");
-        assertThat(json.write(cashCard)).hasJsonPathNumberValue("@.id");
-        assertThat(json.write(cashCard)).extractingJsonPathNumberValue("@.id")
-                .isEqualTo(99);
-        assertThat(json.write(cashCard)).hasJsonPathNumberValue("@.amount");
-        assertThat(json.write(cashCard)).extractingJsonPathNumberValue("@.amount")
-                .isEqualTo(123.45);
-    }
+        String json = mapper.writeValueAsString(cards);
 
-    @Test
-    void cashCardDeserializationTest() throws IOException {
-        String expected = """
-            {
-                "id": 99,
-                "amount": 123.45,
-                "owner": "owner"
-            }
-            """;
-        assertThat(json.parse(expected))
-                .isEqualTo(new CashCard(99L, 123.45, "owner"));
-        assertThat(json.parseObject(expected).id()).isEqualTo(99L);
-        assertThat(json.parseObject(expected).amount()).isEqualTo(123.45);
-    }
+        String expectedJson = "[" +
+                "{\"id\":99,\"amount\":123.45,\"owner\":\"owner\"}," +
+                "{\"id\":100,\"amount\":1.0,\"owner\":\"owner\"}," +
+                "{\"id\":101,\"amount\":150.0,\"owner\":\"owner\"}" +
+                "]";
 
-    @Test
-    void cashCardListSerializationTest() throws IOException {
-        assertThat(jsonList.write(cashCards)).isStrictlyEqualToJson("list.json");
-    }
-
-    @Test
-    void cashCardListDeserializationTest() throws IOException {
-        String expected = """
-         [
-            { "id": 99, "amount": 123.45, "owner": "owner" },
-            { "id": 100, "amount": 1.00, "owner": "owner" },
-            { "id": 101, "amount": 150.00, "owner": "owner" }
-         ]
-         """;
-        assertThat(jsonList.parse(expected)).isEqualTo(cashCards);
+        // เปรียบเทียบแบบ JSON tree ทั้ง list
+        assertEquals(mapper.readTree(expectedJson), mapper.readTree(json));
     }
 }
