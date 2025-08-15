@@ -16,6 +16,11 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+
+import java.security.Principal;
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class CashCardApplicationTests {
 
@@ -117,5 +122,52 @@ class CashCardApplicationTests {
 		// ตรวจสอบว่าค่าที่เราคาดไว้มีอยู่ใน list
 		assertThat(amounts).contains(1.00, 123.45, 150.00);
 	}
+
+	@Test
+	@DirtiesContext
+	void shouldUpdateAnExistingCashCard() {
+		CashCard cashCardUpdate = new CashCard(null, 19.99, null);
+		HttpEntity<CashCard> request = new HttpEntity<>(cashCardUpdate);
+		ResponseEntity<Void> response = restTemplate
+				.withBasicAuth("sarah1", "abc123")
+				.exchange("/cashcards/99", HttpMethod.PUT, request, Void.class); //put request ด้วย .exchange()
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+		ResponseEntity<String> getResponse = restTemplate
+				.withBasicAuth("sarah1", "abc123")
+				.getForEntity("/cashcards/99", String.class);
+		assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+		DocumentContext documentContext = JsonPath.parse(getResponse.getBody());
+		Number id = documentContext.read("$.id");
+		Double amount = documentContext.read("$.amount");
+		assertThat(id).isEqualTo(99);
+		assertThat(amount).isEqualTo(19.99);
+	}
+
+	@Test
+	void shouldNotUpdateACashCardThatDoesNotExist() {
+		CashCard unknownCard = new CashCard(null, 19.99, null);
+		HttpEntity<CashCard> request = new HttpEntity<>(unknownCard);
+		ResponseEntity<Void> response = restTemplate
+				.withBasicAuth("sarah1", "abc123")
+				.exchange("/cashcards/99999", HttpMethod.PUT, request, Void.class);
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+	}
+
+	@Test
+	void shouldNotUpdateACashCardThatIsOwnedBySomeoneElse() {
+		// สร้าง CashCard ของเจ้าของคนอื่น
+		CashCard kumarsCard = new CashCard(102L, 333.33, "kumar"); // เจ้าของเป็น "kumar"
+
+		HttpEntity<CashCard> request = new HttpEntity<>(kumarsCard);
+
+		// ใช้ Basic Auth ของ sarah1 ที่ไม่ใช่เจ้าของ
+		ResponseEntity<Void> response = restTemplate
+				.withBasicAuth("sarah1", "abc123")
+				.exchange("/cashcards/102", HttpMethod.PUT, request, Void.class);
+
+		// คาดว่า server จะตอบ 404 เพราะเจ้าของไม่ตรง
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+	}
+
 
 }
