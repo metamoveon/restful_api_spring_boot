@@ -186,5 +186,25 @@ class CashCardApplicationTests {
 		assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
 	}
 
+	@Test
+	void shouldNotDeleteACashCardThatDoesNotExist() {
+		ResponseEntity<Void> deleteResponse = restTemplate
+				.withBasicAuth("sarah1", "abc123")
+				.exchange("/cashcards/99999", HttpMethod.DELETE, null, Void.class);
+		assertThat(deleteResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+	}
+
+	@Test
+	void shouldNotAllowDeletionOfCashCardsTheyDoNotOwn() {
+		ResponseEntity<Void> deleteResponse = restTemplate
+				.withBasicAuth("sarah1", "abc123")
+				.exchange("/cashcards/102", HttpMethod.DELETE, null, Void.class);
+		// คาดหวัง 403 FORBIDDEN หรือ 404 NOT_FOUND (ขึ้นอยู่กับ security policy)
+		assertThat(deleteResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+		ResponseEntity<String> getResponse = restTemplate
+				.withBasicAuth("kumar2", "xyz789")
+				.getForEntity("/cashcards/102", String.class);
+		assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+	}
 
 }

@@ -4,7 +4,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -83,9 +82,15 @@ class CashCardController {
     }
 
     @DeleteMapping("/{id}")
-    private ResponseEntity<Void> deleteCashCard(@PathVariable Long id) {
-        cashCardRepository.deleteById(id); // Add this line
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<Void> deleteCashCard(  // ✅ เปลี่ยนเป็น public ResponseEntity<Void>
+                                                 @PathVariable Long id,
+                                                 Principal principal
+    ) {
+        // ตรวจสอบว่า CashCard มีอยู่และเป็นของผู้ใช้นี้หรือไม่
+        if (cashCardRepository.existsByIdAndOwner(id, principal.getName())) {
+            cashCardRepository.deleteById(id);
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.notFound().build();
     }
-
 }
